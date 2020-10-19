@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>Create Mahasiswa</title>
+</head>
+<body>
+	<form method="post">
+		<label>NIM</label>
+		<input type="number" name="nim" id="nim"/><br/>
+		<label>Name</label>
+		<input type="text" maxlength="64" name="name" id="name" /><br/>
+		<label>Semester</label>
+		<input type="number" max="14" name="semester" id="semester"/><br/>
+		<input type="button" value="submit" onclick="sendAsJson()" />
+	</form>
+	<script>
+		async function sendAsJson() {
+			let data = {};
+			let keys = ['nim','name','semester']
+			for(let k of keys) {
+				data[k] = document.getElementById(k).value;
+			}
+			data.nim = parseInt(data.nim);
+			data.semester = parseInt(data.semester);
+			let res = await fetch('',{
+				method:'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			})
+			res.json().then(data => {
+				console.log(data);
+			});
+		}
+	</script>
+</body>
+</html>
