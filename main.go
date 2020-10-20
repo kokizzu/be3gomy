@@ -31,6 +31,9 @@ func (s *Server) Listen() {
 	log.Println(`listen at `+addr)
 	http.HandleFunc(`/mahasiswa`, s.Mahasiswa())
 	http.HandleFunc(`/mahasiswa/create`,s.MahasiswaCreate())
+	// update: id, namaBaru, nimBaru, semesterBaru; {jumlahBerhasilDiupdate:0}
+	// delete: id; response: {berhasil:bool,record:{}}
+	http.HandleFunc(`/mahasiswa/delete`,s.MahasiswaDelete())
 	err := http.ListenAndServe(addr,nil)
 	if err != nil {
 		fmt.Println(err)
@@ -61,6 +64,28 @@ func (s *Server) MahasiswaCreate() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 		utils.ResponseJson(w, m)
+	}
+}
+
+func (s *Server) MahasiswaDelete() func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == `GET` {
+			http.ServeFile(w,r,s.ViewDir+`mahasiswa_delete.html`)
+			return
+		}
+		m := model.Mahasiswa{}
+		err := json.NewDecoder(r.Body).Decode(&m)
+		if utils.IsError(w,err) {
+			return
+		}
+		ok, err := mahasiswa.Delete(s.db,&m)
+		if utils.IsError(w,err) {
+			return
+		}
+		res := map[string]interface{}{}
+		res[`deletedRecord`] = m
+		res[`berhasil`] = ok
+		utils.ResponseJson(w, res)
 	}
 }
 

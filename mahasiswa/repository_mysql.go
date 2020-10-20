@@ -54,3 +54,35 @@ VALUES(?,?,?,?,?)`, table)
 	m.UpdatedAt = now
 	return
 }
+
+func Delete(db *sql.DB, m *model.Mahasiswa) (ok bool, err error) {
+	sql := fmt.Sprintf(`SELECT * FROM %v WHERE id = ? `, table)
+	rows, err := db.Query(sql, m.ID)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		createdAt, updatedAt := ``, ``
+		err = rows.Scan(&m.ID,
+			&m.NIM,
+			&m.Name,
+			&m.Semester,
+			&createdAt,
+			&updatedAt)
+		m.CreatedAt, _ = time.Parse(dateformat,createdAt)
+		m.UpdatedAt, _ = time.Parse(dateformat,updatedAt)
+		if err !=nil {
+			return false, err
+		}
+		// really delete
+		sql = fmt.Sprintf(`DELETE FROM %v WHERE id = ?`,table)
+		res, err := db.Exec(sql,m.ID)
+		if err != nil {
+			return false, err
+		}
+		n, err := res.RowsAffected()
+		return n > 0, err
+	}
+	return false, err
+}
