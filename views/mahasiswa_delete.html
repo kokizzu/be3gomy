@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>Create Mahasiswa</title>
+</head>
+<body>
+	<form method="post">
+		<label>ID</label>
+		<input type="number" name="id" id="id"/><br/>
+		<input type="button" value="submit" onclick="sendAsJson()" />
+	</form>
+	<script>
+		async function sendAsJson() {
+			let data = {};
+			let keys = ['id']
+			data.id = +document.getElementById(k).value;
+			let res = await fetch('',{
+				method:'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			})
+			res.json().then(data => {
+				console.log(data);
+			});
+		}
+	</script>
+</body>
+</html>

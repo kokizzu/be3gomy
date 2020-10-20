@@ -55,6 +55,22 @@ VALUES(?,?,?,?,?)`, table)
 	return
 }
 
+func Update(db *sql.DB, m *model.Mahasiswa) (aff int64, err error) {
+	sql := fmt.Sprintf(`UPDATE %v SET name=?, nim=?, semester=?, updated_at=? WHERE id =?`, table)
+	now := time.Now()
+	res, err := db.Exec(sql,m.Name,m.NIM,m.Semester,now,m.ID)
+	if err != nil {
+		return 0,err
+	}
+	ra, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	aff = ra
+	return
+}
+
+
 func Delete(db *sql.DB, m *model.Mahasiswa) (ok bool, err error) {
 	sql := fmt.Sprintf(`SELECT * FROM %v WHERE id = ? `, table)
 	rows, err := db.Query(sql, m.ID)
